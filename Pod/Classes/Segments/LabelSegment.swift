@@ -57,7 +57,8 @@ open class LabelSegment: BetterSegmentedControlSegment {
     
     // MARK: BetterSegmentedControlSegment
     public var intrinsicContentSize: CGSize? {
-        selectedView.intrinsicContentSize
+        let sz = selectedView.intrinsicContentSize
+        return CGSize(width: sz.width + 16, height: sz.height)
     }
     
     public lazy var normalView: UIView = {

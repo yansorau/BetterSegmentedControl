@@ -8,6 +8,7 @@
 
 import UIKit
 import BetterSegmentedControl
+import SnapKit
 
 class ViewController: UIViewController {
     
@@ -32,25 +33,25 @@ class ViewController: UIViewController {
                                              action: #selector(ViewController.navigationSegmentedControlValueChanged(_:)),
                                              for: .valueChanged)
         navigationItem.titleView = navigationSegmentedControl
-        
+
         // Control 1: Created and designed in IB
         control1.segments = LabelSegment.segments(withTitles: ["Recent", "Nearby", "All"],
                                                   normalTextColor: UIColor(red: 0.48, green: 0.48, blue: 0.51, alpha: 1.00))
-        
+
         // Control 2: Created and designed in IB
         control2.segments = LabelSegment.segments(withTitles: ["Music", "Movies", "Apps"],
                                                   normalTextColor: .white,
                                                   selectedTextColor: UIColor(red: 0.92, green: 0.29, blue: 0.15, alpha: 1.00))
-        
+
         // Control 3: Many options
-        control3.segments = LabelSegment.segments(withTitles: ["One", "Two", "Three", "Four", "Five"],
+        control3.segments = LabelSegment.segments(withTitles: ["Inbox", "Conversation"],
                                                   normalFont: .systemFont(ofSize: 14.0),
                                                   normalTextColor: UIColor(red: 0.15, green: 0.39, blue: 0.96, alpha: 0.9),
                                                   selectedFont: .systemFont(ofSize: 14.0),
                                                   selectedTextColor: UIColor(red: 0.16, green: 0.40, blue: 0.96, alpha: 1.00))
-        
+
         // Control 4: Created and designed in IB, self-sizing
-        
+
         // Control 5: Basic Icons
         let iconsSegmentedControl = BetterSegmentedControl(
             frame: CGRect(x: 0.0, y: 380.0, width: 160, height: 30.0),
@@ -63,7 +64,7 @@ class ViewController: UIViewController {
                       .indicatorViewBackgroundColor(.white)])
         iconsSegmentedControl.center.x = view.center.x
         view.addSubview(iconsSegmentedControl)
-        
+
         // Control 6: Apple style
         let appleStyledControl: BetterSegmentedControl = .appleStyled(frame: CGRect(x: 16.0,
                                                                                     y: 435,
@@ -71,7 +72,7 @@ class ViewController: UIViewController {
                                                                                     height: 32.0),
                                                                       titles: ["First", "Second", "Third"])
         view.addSubview(appleStyledControl)
-        
+
         // Control 7: No initially selected segment
         let noSelectedSegmentControl = BetterSegmentedControl(
             frame: CGRect(x: 16.0, y: 490, width: view.bounds.width - 32.0, height: 44.0),
@@ -79,6 +80,30 @@ class ViewController: UIViewController {
             index: -1)
         noSelectedSegmentControl.addTarget(self, action: #selector(segmentedControl1ValueChanged(_:)), for: .valueChanged)
         view.addSubview(noSelectedSegmentControl)
+
+
+        let segments = LabelSegment.segments(withTitles: ["Inbox", "Conversation"],
+                                             normalBackgroundColor: .lightGray,
+                                                  normalFont: .systemFont(ofSize: 10.0),
+                                             normalTextColor: UIColor.white,
+                                             selectedBackgroundColor: .blue,
+                                                  selectedFont: .systemFont(ofSize: 10.0),
+                                             selectedTextColor: UIColor.white)
+        let c = BetterSegmentedControl(frame: .zero, segments: segments)
+        c.cornerRadius = 22
+        c.segmentPadding = 0
+        c.indicatorViewInset = 11
+        self.view.addSubview(c)
+        c.snp.makeConstraints { make in
+            make.top.equalTo(noSelectedSegmentControl.snp.bottom).offset(40)
+            make.height.equalTo(44)
+            make.centerX.equalToSuperview()
+        }
+        c.layer.borderColor = UIColor.blue.cgColor
+        c.layer.borderWidth = 1
+        c.animationSpringDamping = 1
+
+
     }
     
     // MARK: - Action handlers

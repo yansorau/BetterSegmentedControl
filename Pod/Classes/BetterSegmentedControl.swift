@@ -115,14 +115,14 @@ import UIKit
         let maxSegmentIntrinsicContentSizeWidth = segmentIntrinsicContentSizes.max(by: { (a, b) in
             return a.width < b.width
         })?.width ?? 0.0
+
+        let sumSegmentIntrinsicWidth = segmentIntrinsicContentSizes.map { $0.width }.reduce(0, +)
         
         let maxSegmentIntrinsicContentSizeHeight = segmentIntrinsicContentSizes.max(by: { (a, b) in
             return a.height < b.height
         })?.height ?? 0.0
-        
-        let singleSegmentWidth = totalInsetSize + max(maxSegmentIntrinsicContentSizeWidth, Constants.minimumSegmentIntrinsicContentSizeWidth) + segmentPadding
-        
-        let width = ceil(CGFloat(segments.count) * singleSegmentWidth)
+
+        let width = ceil(totalInsetSize + sumSegmentIntrinsicWidth + segmentPadding * CGFloat(segments.count - 1))
         let height = ceil(max(maxSegmentIntrinsicContentSizeHeight + totalInsetSize, Constants.minimumIntrinsicContentSizeHeight))
         
         return .init(width: width, height: height)
@@ -435,7 +435,19 @@ import UIKit
     
     private func updateCornerRadii() {
         indicatorView.cornerRadius = cornerRadius - indicatorViewInset
-        allSegmentViews.forEach { $0.layer.cornerRadius = indicatorView.cornerRadius }
+//        allSegmentViews.forEach { $0.layer.cornerRadius = indicatorView.cornerRadius }
+        normalSegmentViews.first?.layer.cornerRadius = indicatorView.cornerRadius
+        if #available(iOS 11.0, *) {
+            normalSegmentViews.first?.layer.maskedCorners = [.layerMinXMinYCorner, .layerMinXMaxYCorner]
+        } else {
+            // Fallback on earlier versions
+        }
+        normalSegmentViews.last?.layer.cornerRadius = indicatorView.cornerRadius
+        if #available(iOS 11.0, *) {
+            normalSegmentViews.last?.layer.maskedCorners = [.layerMaxXMinYCorner, .layerMaxXMaxYCorner]
+        } else {
+            // Fallback on earlier versions
+        }
     }
     
     private func updateSegmentViewTraits() {
@@ -447,8 +459,12 @@ import UIKit
     }
     
     private func frameForElement(atIndex index: Int) -> CGRect {
-        let elementWidth = (width - totalInsetSize) / CGFloat(normalSegmentViewCount)
-        let x = CGFloat(isLayoutDirectionRightToLeft ? lastIndex - index : index) * elementWidth
+        var left = 0.0
+        for i in 0..<index {
+            left += (segments[i].intrinsicContentSize?.width ?? 0.0) + segmentPadding
+        }
+        let elementWidth = segments[index].intrinsicContentSize?.width ?? 0.0
+        let x = left
         
         return CGRect(x: x + indicatorViewInset,
                       y: indicatorViewInset,
